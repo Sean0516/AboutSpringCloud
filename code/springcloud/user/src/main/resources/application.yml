@@ -1,7 +1,7 @@
 eureka:
   client:
     service-url:
-      defaultZone: http://127.0.0.1:5000/eureka/,http://127.0.0.1:5001/eureka/
+      defaultZone: http://127.0.0.1:5000/eureka/
   instance:
     # 微服务实例超时失效秒数，默认为90 秒 倘若续约超时，Eureka 会将微服务实例剔除
     lease-expiration-duration-in-seconds: 90
@@ -11,4 +11,4 @@ spring:
   application:
     name: user
 server:
-  port: 6000
+  port: 6001
