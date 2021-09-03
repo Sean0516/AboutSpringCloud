@@ -7,4 +7,6 @@ spring:
     name: product
 server:
   port: 7001
-
+feign:
+  hystrix:
+    enabled: true

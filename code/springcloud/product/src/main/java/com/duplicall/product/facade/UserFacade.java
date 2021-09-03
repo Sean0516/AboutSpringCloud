@@ -15,25 +15,27 @@ import java.util.List;
  * @FeignClient("user") 表示接口是一个OpenFeign 的客户端 user 是微服务的名称，指向用户微服务。
  * @Version 1.0
  */
-@FeignClient("user")
+@FeignClient(value = "user", fallbackFactory = UserFallBackFactory.class)
 public interface UserFacade {
     @GetMapping("/user/info/{id}")
     UserInfo getUser(@PathVariable("id") String id);
 
     @PutMapping("/user/info")
     String updateUser(@RequestBody UserInfo userInfo);
+
     @GetMapping("user/userList")
     List<UserInfo> userList(@RequestParam("ids") String[] ids);
 
     @DeleteMapping("/user/info")
-    String delete(@RequestHeader("id")String id);
+    String delete(@RequestHeader("id") String id);
 
     /**
      * 提交一个 multipart / from-data 类型的表单
+     *
      * @param file
      * @return
      */
-    @RequestMapping(value = "user/upload" ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    String upload(@RequestPart("file")MultipartFile file);
+    @RequestMapping(value = "user/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    String upload(@RequestPart("file") MultipartFile file);
 
 }
