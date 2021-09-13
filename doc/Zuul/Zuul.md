@@ -18,26 +18,5 @@ Netflix Zuul是一个API网关，它的主要功能是提供网关服务。Netfl
 
 因为网关最先得到请求，所以一般企业会将所有对微服务的请求先集中到网关，然后再分发，实现统一的请求入口
 
-### Zuul 原理 -- 过滤器
 
-Zuul的原理并非十分复杂，相反的，可能还算比较简单，它的本质就是一套Servlet的API。其中ZuulServlet是核心Servlet，它将接收各类请求。此外NetflixZuul还提供了ZuulServletFilter，它是一个拦截器，可以拦截各类请求。ZuulServlet和ZuulServletFilter就是Zuul的核心内容。为了更加方便地增加和删除拦截逻辑，在ZuulServlet和ZuulServletFilter的基础上，Netflix Zuul定义了自己的过滤器——ZuulFilter。而ZuulFilter就是本章的核心内容，基本网关大部分的逻辑都要通过它来实现
-
-当我们继承ZuulFilter后，需要实现这4个方法，而系统中已经提供了许多ZuulFilter的实现类，它们已经实现了这4个抽象方法。下面我们来了解这4个方法的作用
-
-- shouldFilter：是否执行过滤器逻辑，也就是可以根据上下文判定是否采用过滤器拦截请求。
-- run：过滤器的具体逻辑，它是过滤器的核心方法，将返回一个Object对象，倘若返回为null，则表示继续后续的正常逻辑。
-- filterType：过滤器类型，有4种类型可设置：“pre”“route”“post”和“error”。
-- filterOrder：设置过滤器的顺序
-
- filterType方法返回的字符串代表的是过滤类型，该类型是以源服务器进行区分的。按其定义分为4种
-
-- pre：在路由到源服务器前执行的逻辑，如鉴权、选择具体的源服务器节点和参数处理等，都可以在这里实现。
-
-- route：执行路由到源服务器的逻辑，如之前我们谈到的Apache HttpClient或者Netflix Ribbon，当前也支持OKHttp。
-
-- post：在路由到源服务器后执行的过滤器，常见的用法是把标准的HTTP响应头添加到响应中，此外也可以通过它来收集响应的度量数据，统计成功率，还可以对源服务器请求返回的数据再次加工，然后返回到客户端，等等。
-
-- error：倘若在整个路由源服务器的执行的过程中发生异常，就可以进入此类过滤器，它可以做全局的响应逻辑处理错误
-
-Zuul会将多个过滤器组织为一个责任链，那么各个过滤器会以什么顺序组织呢？这是由filterOrder方法决定的，它是返回一个数字，该数字越小，在过滤器链中就越优先执行
 

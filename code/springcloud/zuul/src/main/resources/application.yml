@@ -18,3 +18,15 @@ zuul:
     user-server:
       path: /u/**
       service-id: user
+
+resilience4j:
+  ratelimiter:
+    limiters:
+      # 名称为usr 的限速器
+      user:
+        # 时间戳内限制通过的请求数
+        limitForPeriod: 3
+        # 配置时间戳
+        limitRefreshPeriod: 10000
+        # 超时时间
+        timeoutDuration: 5

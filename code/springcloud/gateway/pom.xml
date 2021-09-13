@@ -3,43 +3,33 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>com.duplicall</groupId>
+    <artifactId>gateway</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>gateway</name>
     <parent>
         <artifactId>springcloud</artifactId>
         <groupId>com.duplicall</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-
-    <groupId>com.duplicall</groupId>
-    <artifactId>zuul</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>zuul</name>
     <description>Demo project for Spring Boot</description>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>io.github.resilience4j</groupId>
-            <artifactId>resilience4j-spring-boot2</artifactId>
-            <version>1.7.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.marcosbarbero.cloud</groupId>
-            <artifactId>spring-cloud-zuul-ratelimit</artifactId>
-            <version>2.2.2.RELEASE</version>
-        </dependency>
     </dependencies>
+
 
     <build>
         <plugins>
