@@ -64,3 +64,110 @@ exchange：数据交换对象，通过它的getRequest方法可以获取请求�
 
 chain：Gateway过滤器责任链，调用它的filter(ServerWebExchange)方法，表示继续执行责任链里后续的过滤器
 
+```yaml
+resilience4j:
+  ratelimiter:
+    limiters:
+      # 名称为usr 的限速器
+      user:
+        # 时间戳内限制通过的请求数
+        limitForPeriod: 3
+        # 配置时间戳
+        limitRefreshPeriod: 10000
+        # 超时时间
+        timeoutDuration: 5
+```
+
+```java
+public class LimitFilter implements GatewayFilter {
+    private final Logger logger= LoggerFactory.getLogger(this.getClass());
+    @Autowired
+    private RateLimiterRegistry rateLimiterRegistry;
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        RateLimiter user = rateLimiterRegistry.rateLimiter("user");
+        Callable<String> callable = () ->
+        {
+            logger.info("date [{}]", LocalDateTime.now());
+            return "success";
+        };
+//         绑定限速器
+        Callable<String> call = RateLimiter.decorateCallable(user, callable);
+//        尝试获取结果
+        Try<String> recover = Try.of(call::call).recover(throwable -> {
+//           降级逻辑
+            logger.info(throwable.getMessage(), throwable);
+            return "TOO MANY REQUEST";
+        });
+        String s = recover.get();
+        if ("success".equals(s)) {
+            return chain.filter(exchange);
+        }
+//        超过限流的处理
+        ServerHttpResponse response = exchange.getResponse();
+        response.setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+        DataBuffer wrap = response.bufferFactory().wrap("请求过多".getBytes(StandardCharsets.UTF_8));
+        return response.writeWith(Mono.just(wrap));
+    }
+}
+
+    @Bean
+    public GatewayFilter limitFilter() {
+        return new LimitFilter();
+    }
+
+RouteLocatorBuilder.Builder route = builder.routes().route("/user/**",
+                r -> r.query("id").filters(filter -> filter.filter(limitFilter())).uri("http://localhost:6001"));
+        return route.build();
+```
+
+### 全局过滤器
+
+在Gateway的机制中，只要一个类实现了GlobalFilter接口，并且装配到IoC容器中，Gateway就会将它识别为全局过滤器。对于全局过滤器，执行路由命令的处理器（FilteringWebHandler）会把它转变为GatewayFilter，放到过滤器链中的，然后再去执行这条过滤器链
+
+要定义一个全局过滤器，只需要实现GlobalFilter接口，并且装配到IoC容器中即可
+
+```java
+public class TokenFilter implements GlobalFilter {
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        if (StringUtils.isNotEmpty(exchange.getRequest().getHeaders().getFirst("token"))) {
+            return chain.filter(exchange);
+        } else {
+            String token = exchange.getRequest().getQueryParams().getFirst("token");
+            if (StringUtils.isNotEmpty(token)) {
+                ServerHttpRequest request = exchange.getRequest().mutate().header("token", token).build();
+                return chain.filter(exchange.mutate().request(request).build());
+            } else {
+                ServerHttpResponse response = exchange.getResponse();
+                response.setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
+                response.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+                DataBuffer wrap = response.bufferFactory().wrap("no token info".getBytes(StandardCharsets.UTF_8));
+                return response.writeWith(Mono.just(wrap));
+            }
+        }
+    }
+}
+	// 注入bean
+    @Bean
+    public GlobalFilter tokenFilter() {
+        return new TokenFilter();
+    }
+```
+
+### 过滤器排序
+
+Gateway也定义了一个Ordered（org.springframework.core.Ordered）接口来支持排序
+
+这些全局过滤器都实现了GlobalFilter和Ordered接口，所以它们都具备排序的功能。在Ordered接口中有两个常量，一个是HIGHEST_PRECEDENCE（最高优先级），它的取值为最小整数，也就是Integer.MIN_VALUE（-2 147 483 648）；另一个是LOWEST_PRECEDENCE（最低优先级），它的取值为最大整数，也就是Integer.MAX_VALUE（2 147 483 647）
+
+只需要实现Orderd 接口，重写getOrder 方法即可
+
+
+
+如果想对局部过滤器进行排序，也可以类似全局过滤器那样实现Ordered接口。此外，在Gateway中，还有一个适配类——OrderedGatewayFilter，通过它也可以实现对过滤器进行排序
+
+
+

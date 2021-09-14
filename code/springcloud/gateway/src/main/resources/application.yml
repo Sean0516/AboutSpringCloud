@@ -10,3 +10,24 @@ spring:
 #          uri: http://localhost:6001
 #          predicates:
 #            - Path=/user/**
+resilience4j:
+  ratelimiter:
+    limiters:
+      # 名称为usr 的限速器
+      user:
+        # 时间戳内限制通过的请求数
+        limitForPeriod: 3
+        # 配置时间戳
+        limitRefreshPeriod: 10000
+        # 超时时间
+        timeoutDuration: 5
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:5000/eureka/
+  instance:
+    # 微服务实例超时失效秒数，默认为90 秒 倘若续约超时，Eureka 会将微服务实例剔除
+    lease-expiration-duration-in-seconds: 90
+    # 间隔对应的秒数执行一次续约服务  默认为30 秒
+    lease-renewal-interval-in-seconds: 30
