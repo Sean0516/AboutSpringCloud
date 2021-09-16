@@ -4,21 +4,27 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.duplicall</groupId>
-    <artifactId>zipkinserver</artifactId>
+    <artifactId>config_user</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>zipkinserver</name>
+    <name>config_user</name>
     <description>Demo project for Spring Boot</description>
+
     <parent>
-        <artifactId>sleuth</artifactId>
+        <artifactId>cloud_config</artifactId>
         <groupId>com.duplicall</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
+
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
@@ -27,25 +33,14 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>io.zipkin.java</groupId>
-            <artifactId>zipkin-server</artifactId>
-            <version>2.12.3</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.zipkin.java</groupId>
-            <artifactId>zipkin-autoconfigure-ui</artifactId>
-            <version>2.12.3</version>
-        </dependency>
-
-
     </dependencies>
+
 
     <build>
         <plugins>

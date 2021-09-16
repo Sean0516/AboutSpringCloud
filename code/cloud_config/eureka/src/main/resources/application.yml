@@ -1,0 +1,15 @@
+eureka:
+  client:
+    #    # 服务本身是注册中信，因此设置为false 取消注册
+    register-with-eureka: false
+    #    # 取消服务获取的功能
+    fetch-registry: false
+#因为我们不需要注册微服务。如果需要注册微服务，可以通过这个属性来配置服务治理中心的注册地址，完成服务注册的功能
+#    service-url:
+#      defaultZone: http://127.0.0.1:5000/eureka
+server:
+  port: 5000
+# 微服务名称
+spring:
+  application:
+    name: eurekaserver
