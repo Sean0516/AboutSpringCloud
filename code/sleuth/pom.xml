@@ -10,6 +10,8 @@
     <modules>
 
         <module>zipkinserver</module>
+        <module>sleuthprovider</module>
+        <module>eurekaserver</module>
     </modules>
     <packaging>pom</packaging>
 
