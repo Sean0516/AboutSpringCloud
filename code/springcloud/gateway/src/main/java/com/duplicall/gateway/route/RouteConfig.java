@@ -48,7 +48,7 @@ public class RouteConfig {
         ZonedDateTime end = LocalDateTime.now().plusMinutes(4).atZone(ZoneId.systemDefault());
 
         RouteLocatorBuilder.Builder route = builder.routes().route("user-service",
-                r -> r.path("/user/**").and().query("id").filters(filter-> filter.filter(limitFilter())).uri("lb://user"));
+                r -> r.path("/userServer/**").and().query("id").filters(filter-> filter.filter(limitFilter())).uri("lb://user"));
         return route.build();
     }
 
